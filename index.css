@@ -17,9 +17,17 @@ body {
     color: #ffffff;
 }
 
-/* ✏️ Input */
-input {
-    
+#head {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin-top: 1px;
+    margin-bottom: 40px;
+    text-align: center;
+    color: #f9c1c1;
+}
+
+/* ✏️ TEXT INPUTS ONLY */
+input[type="text"],
+input[type="url"] {
     width: 100%;
     padding: 12px;
     font-size: 0.95rem;
@@ -39,8 +47,10 @@ input::placeholder {
 }
 
 /* ✨ Input effects */
-input:hover,
-input:focus {
+input[type="text"]:hover,
+input[type="text"]:focus,
+input[type="url"]:hover,
+input[type="url"]:focus {
     outline: none;
     border: 1px solid #4ade80;
     box-shadow:
@@ -48,11 +58,13 @@ input:focus {
         0 0 20px rgba(96, 165, 250, 0.6);
 }
 
-/* 🔘 Buttons */
-button {
-    margin-left: 4px;
-    margin-right: 4px;
-    margin-top: 8px;
+#name {
+    margin-bottom: 7px;
+}
+
+/* 🔘 Utility Buttons */
+.utility-btn {
+    margin: 8px 4px 0;
     padding: 10px 18px;
     font-size: 0.85rem;
     font-weight: 700;
@@ -61,16 +73,16 @@ button {
     cursor: pointer;
     color: rgb(0, 0, 0);
     background: linear-gradient(135deg, #4ade80, #22c55e);
-    transition: transform 0.1s ease, box-shadow 0.15s ease;
+    transition: transform 0.12s ease, box-shadow 0.15s ease;
 }
 
-button:hover {
-    transform: scale(1.1);
+.utility-btn:hover {
+    transform: scale(1.04);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
-button:active {
-    transform: scale(0.94);
+.utility-btn:active {
+    transform: scale(0.96);
 }
 
 /* 🗑 Delete button */
@@ -100,6 +112,9 @@ li {
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 li:hover {
@@ -109,7 +124,7 @@ li:hover {
 /* 🔗 Links */
 a {
     text-decoration: none;
-    color:rgb(99, 227, 40);
+    color: rgb(99, 227, 40);
     font-weight: 600;
     word-break: break-all;
 }
@@ -118,19 +133,98 @@ a:hover {
     text-decoration: underline;
 }
 
-#head{
-    font-family:Georgia, 'Times New Roman', Times, serif;
-    margin-top:1px;
-    margin-bottom: 40px;
-    text-align: center;
-    color: #f9c1c1;
+/* ✅ Custom Checkbox */
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-#name{
-    margin-bottom: 7px;
+/* hide native checkbox */
+.checkbox input {
+    display: none;
 }
 
-#header-icon{
+/* circular box */
+.custom-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #4ade80;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* hover glow */
+.checkbox:hover .custom-box {
+    background: rgba(74, 222, 128, 0.2);
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+/* checkmark SVG */
+.check-icon {
+    width: 14px;
+    height: 14px;
+    stroke: #0b0b0b;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: all 0.15s ease;
+}
+
+/* show ✔ when checked */
+.checkbox input:checked + .custom-box {
+    background: #4ade80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
+}
+
+.checkbox input:checked + .custom-box .check-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* checkbox text alignment */
+.checkbox a {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 🗑 Delete icon button */
+.del-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.del-btn:hover {
+  transform: scale(1.15);
+}
+
+.del-btn:active {
+  transform: scale(0.95);
+}
+
+.del-svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Header icon */
+#header-icon {
     width: 40px;
     height: 40px;
 }
