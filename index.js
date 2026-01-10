@@ -23,6 +23,13 @@ inputBtn.addEventListener("click", function () {
 
 });
 
+quesNameEl.addEventListener("input",()=>{
+  let val=quesNameEl.value;
+
+  localStorage.setItem("quesNameInput",val);
+
+})
+
 deleteBtn.addEventListener("click", () => {
   localStorage.removeItem("myQuestions"); // remove questions from localStorage
   myQuestions = []; // clear array
@@ -38,6 +45,8 @@ tabBtn.addEventListener("click", () => {
     if(quesNameEl.value) quesName=quesNameEl.value;
     else quesName=tab
 
+    clearInputs();
+
     myQuestions.push({url:tab,name:quesName});
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
 
@@ -48,11 +57,15 @@ tabBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  quesNameEl.value = localStorage.getItem("quesNameInput") || "";
+
   const storedQuestions = JSON.parse(localStorage.getItem("myQuestions"));
 
   if (storedQuestions) {
     myQuestions = storedQuestions;
   }
+
 
   renderQuestions();
   refreshHeading();
@@ -103,4 +116,5 @@ function getQuestionName(question) {
 function clearInputs() {
   inputEl.value = "";
   quesNameEl.value = "";
+  localStorage.removeItem("quesNameInput")
 }
