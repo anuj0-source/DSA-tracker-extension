@@ -1,0 +1,136 @@
+/* 🌈 Global */
+body {
+    margin: 0;
+    padding: 14px;
+    min-width: 400px;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #000000, #152227, #000503);
+    color: #eaeaea;
+}
+
+/* 🔤 Heading */
+#heading {
+    margin: 20px 0 8px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* ✏️ Input */
+input {
+    
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    box-sizing: border-box;
+    transition: all 0.25s ease;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ✨ Input effects */
+input:hover,
+input:focus {
+    outline: none;
+    border: 1px solid #4ade80;
+    box-shadow:
+        0 0 10px rgba(74, 222, 128, 0.6),
+        0 0 20px rgba(96, 165, 250, 0.6);
+}
+
+/* 🔘 Buttons */
+button {
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 8px;
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+button:active {
+    transform: scale(0.94);
+}
+
+/* 🗑 Delete button */
+#delete-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* 📌 Tab button */
+#tab-btn {
+    padding: 10px;
+    background: linear-gradient(135deg, #74777c, #2bd019);
+}
+
+/* 📃 List */
+ul {
+    margin-top: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+/* 📎 List item */
+li {
+    margin-top: 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    transition: background 0.2s ease;
+}
+
+li:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* 🔗 Links */
+a {
+    text-decoration: none;
+    color:rgb(99, 227, 40);
+    font-weight: 600;
+    word-break: break-all;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#head{
+    font-family:Georgia, 'Times New Roman', Times, serif;
+    margin-top:1px;
+    margin-bottom: 40px;
+    text-align: center;
+    color: #f9c1c1;
+}
+
+#name{
+    margin-bottom: 7px;
+}
+
+#header-icon{
+    width: 40px;
+    height: 40px;
+}
