@@ -12,12 +12,27 @@
 
     <h1 id="head">Problem Tracker 
         <svg id="header-icon" width="36" height="36" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <!-- Target/Progress ring -->
-            <circle cx="32" cy="32" r="26" stroke="#F2D86D" stroke-width="4" fill="none" opacity="0.3"/>
-            <circle cx="32" cy="32" r="26" stroke="#9CB34E" stroke-width="4" fill="none" stroke-dasharray="120 200" stroke-linecap="round" transform="rotate(-90 32 32)"/>
-            <!-- Center checkmark -->
-            <circle cx="32" cy="32" r="14" fill="#9CB34E"/>
-            <path d="M24 32 L29 37 L40 25" stroke="#FFFEF2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Clipboard back -->
+            <rect x="12" y="8" width="40" height="50" rx="4" fill="#4ade80"/>
+            <!-- Clipboard front/paper -->
+            <rect x="16" y="14" width="32" height="40" rx="2" fill="#eaeaea"/>
+            <!-- Clipboard clip -->
+            <rect x="24" y="4" width="16" height="10" rx="2" fill="#22c55e"/>
+            <rect x="27" y="6" width="10" height="6" rx="1" fill="#4ade80"/>
+            <!-- Checkmark 1 -->
+            <circle cx="22" cy="24" r="3" fill="#22c55e"/>
+            <path d="M20 24 L21.5 25.5 L24 22" stroke="#eaeaea" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Line 1 -->
+            <rect x="28" y="22" width="16" height="3" rx="1" fill="#9ca3af"/>
+            <!-- Checkmark 2 -->
+            <circle cx="22" cy="34" r="3" fill="#22c55e"/>
+            <path d="M20 34 L21.5 35.5 L24 32" stroke="#eaeaea" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Line 2 -->
+            <rect x="28" y="32" width="12" height="3" rx="1" fill="#9ca3af"/>
+            <!-- Empty circle 3 -->
+            <circle cx="22" cy="44" r="3" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+            <!-- Line 3 -->
+            <rect x="28" y="42" width="14" height="3" rx="1" fill="#9ca3af"/>
         </svg>
     </h1>
     <input type="text" id="name" placeholder="Enter Question Name">
@@ -26,7 +41,7 @@
     <div class="actions">
         <button id="input-btn" class="utility-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            Save question
+            Add question
         </button>
         <button id="tab-btn" class="utility-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
