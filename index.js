@@ -1,4 +1,5 @@
 let myQuestions = [];
+let set=new Set();
 
 const inputEl = document.getElementById("input-el");
 const inputBtn = document.getElementById("input-btn");
@@ -9,7 +10,15 @@ const heading = document.querySelector("#heading");
 const quesNameEl = document.querySelector("#name");
 
 inputBtn.addEventListener("click", function () {
-  if (inputEl.value === "") return;
+  if (inputEl.value === "") {
+    showToast("⚠️ Please enter a URL!");
+    return;
+  }
+  
+  if (set.has(inputEl.value)) {
+    showToast("⚠️ This question already exists!");
+    return;
+  }
 
   myQuestions.push({
     id: crypto.randomUUID(),
@@ -17,6 +26,8 @@ inputBtn.addEventListener("click", function () {
     name: quesNameEl.value,
     status:false
   });
+
+  set.add(inputEl.value);
 
   clearInputs();
   localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
@@ -32,6 +43,8 @@ deleteBtn.addEventListener("click", () => {
   const items = ulEl.querySelectorAll("li");
   
   if (items.length === 0) return;
+
+  set=new Set();
   
   items.forEach((li, index) => {
     setTimeout(() => {
@@ -53,6 +66,14 @@ tabBtn.addEventListener("click", () => {
     let tab = tabs[0].url;
     let quesName = quesNameEl.value ? quesNameEl.value : tab;
 
+    if(set.has(tab)) {
+      showToast("⚠️ This question already exists!");
+      return;
+    }
+
+    set.add(tab);
+
+
     clearInputs();
 
     myQuestions.push({
@@ -72,11 +93,15 @@ document.addEventListener("DOMContentLoaded", () => {
   quesNameEl.value = localStorage.getItem("quesNameInput") || "";
 
   const storedQuestions = JSON.parse(localStorage.getItem("myQuestions"));
-  if (storedQuestions) myQuestions = storedQuestions;
+  if (storedQuestions) {
+    myQuestions = storedQuestions;
+    myQuestions.forEach(q => set.add(q.url)); // 🔥 FIX
+  }
 
   renderQuestions();
   refreshHeading();
 });
+
 
 /* =============== SINGLE REUSABLE FUNCTION =============== */
 
@@ -171,12 +196,16 @@ function deleteQuestion(id, li) {
   li.classList.add("deleting");
 
   setTimeout(() => {
+    const removed = myQuestions.find(q => q.id === id);
+    if (removed) set.delete(removed.url); // 🔥 FIX
+
     myQuestions = myQuestions.filter(q => q.id !== id);
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
     li.remove();
     refreshHeading();
   }, 300);
 }
+
 
 function lineThrough(input,link,question){
   if(input.checked){
@@ -190,4 +219,17 @@ function lineThrough(input,link,question){
     question.status=false;
     localStorage.setItem("myQuestions",JSON.stringify(myQuestions));
   }
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toast-message");
+  
+  toastMessage.textContent = message;
+  toast.classList.add("show");
+  
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+
 }
