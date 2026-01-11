@@ -1,5 +1,5 @@
 let myQuestions = [];
-let set=new Set();
+let set = new Set();
 
 const inputEl = document.getElementById("input-el");
 const inputBtn = document.getElementById("input-btn");
@@ -14,7 +14,7 @@ inputBtn.addEventListener("click", function () {
     showToast("⚠️ Please enter a URL!");
     return;
   }
-  
+
   if (set.has(inputEl.value)) {
     showToast("⚠️ This question already exists!");
     return;
@@ -24,7 +24,7 @@ inputBtn.addEventListener("click", function () {
     id: crypto.randomUUID(),
     url: inputEl.value,
     name: quesNameEl.value,
-    status:false
+    status: false
   });
 
   set.add(inputEl.value);
@@ -41,11 +41,11 @@ quesNameEl.addEventListener("input", () => {
 
 deleteBtn.addEventListener("click", () => {
   const items = ulEl.querySelectorAll("li");
-  
+
   if (items.length === 0) return;
 
-  set=new Set();
-  
+  set = new Set();
+
   items.forEach((li, index) => {
     setTimeout(() => {
       li.classList.add("deleting");
@@ -64,9 +64,9 @@ deleteBtn.addEventListener("click", () => {
 tabBtn.addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     let tab = tabs[0].url;
-    let quesName = quesNameEl.value ? quesNameEl.value : tab;
+    let quesName = quesNameEl.value ? quesNameEl.value : findQuesName(tab);
 
-    if(set.has(tab)) {
+    if (set.has(tab)) {
       showToast("⚠️ This question already exists!");
       return;
     }
@@ -80,7 +80,7 @@ tabBtn.addEventListener("click", () => {
       id: crypto.randomUUID(),
       url: tab,
       name: quesName,
-      status:false
+      status: false
     });
 
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
@@ -150,12 +150,12 @@ function createQuestionElement(question) {
   linkWrapper.classList.add("link-wrapper");
   linkWrapper.append(link, tooltip);
 
-  if(question.status){
-    input.checked=true;
-    lineThrough(input,link,question);
+  if (question.status) {
+    input.checked = true;
+    lineThrough(input, link, question);
   }
 
-  input.addEventListener("change",()=>{lineThrough(input,link,question)});
+  input.addEventListener("change", () => { lineThrough(input, link, question) });
 
 
   label.append(input, customBox, linkWrapper);
@@ -216,29 +216,66 @@ function deleteQuestion(id, li) {
 }
 
 
-function lineThrough(input,link,question){
-  if(input.checked){
+function lineThrough(input, link, question) {
+  if (input.checked) {
     link.classList.add("checked");
-    question.status=true;
-    localStorage.setItem("myQuestions",JSON.stringify(myQuestions));
+    question.status = true;
+    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
 
   }
   else {
     link.classList.remove("checked");
-    question.status=false;
-    localStorage.setItem("myQuestions",JSON.stringify(myQuestions));
+    question.status = false;
+    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
   }
 }
 
 function showToast(message) {
   const toast = document.getElementById("toast");
   const toastMessage = document.getElementById("toast-message");
-  
+
   toastMessage.textContent = message;
   toast.classList.add("show");
-  
+
   setTimeout(() => {
     toast.classList.remove("show");
   }, 2500);
 
+}
+
+function findQuesName(url) {
+  if (url.includes("geeksforgeeks.org") || url.includes("leetcode.com") || url.includes("naukri.com")) {
+    let i = url.indexOf("problems/");
+    let name = "";
+    if (i >= 0) {
+      i += 9;
+      let start=true;
+      while (
+        isUpperCase(url.charAt(i)) || // A-Z
+        isLowerCase(url.charAt(i)) || // a-z
+        (url.charAt(i) === '-')||
+        (url.charCodeAt(i) >= 48 && url.charCodeAt(i) <= 57 && start)
+      ) {
+        if(start && url.charAt(i) == '-' || isUpperCase(url.charAt(i)) || isLowerCase(url.charAt(i))) start=false;
+        if (url.charAt(i) == '-') name += " ";
+        else name += url.charAt(i);
+        i++;
+      }
+
+      return name;
+    }
+    else return url;
+  } else return url;
+}
+
+function isUpperCase(char) {
+  if (!char) return false;
+  const code = char.charCodeAt(0);
+  return code >= 65 && code <= 90;
+}
+
+function isLowerCase(char) {
+  if (!char) return false;
+  const code = char.charCodeAt(0);
+  return code >= 97 && code <= 122;
 }
