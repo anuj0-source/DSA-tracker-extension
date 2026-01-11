@@ -15,10 +15,10 @@ inputBtn.addEventListener("click", function () {
     id: crypto.randomUUID(),
     url: inputEl.value,
     name: quesNameEl.value,
+    status:false
   });
 
   clearInputs();
-
   localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
   showQuestion();
   refreshHeading();
@@ -29,16 +29,28 @@ quesNameEl.addEventListener("input", () => {
 });
 
 deleteBtn.addEventListener("click", () => {
-  localStorage.removeItem("myQuestions");
-  myQuestions = [];
-  ulEl.innerHTML = "";
-  refreshHeading();
+  const items = ulEl.querySelectorAll("li");
+  
+  if (items.length === 0) return;
+  
+  items.forEach((li, index) => {
+    setTimeout(() => {
+      li.classList.add("deleting");
+    }, index * 50); // stagger animation
+  });
+
+  setTimeout(() => {
+    localStorage.removeItem("myQuestions");
+    myQuestions = [];
+    ulEl.innerHTML = "";
+    refreshHeading();
+  }, items.length * 50 + 300);
+
 });
 
 tabBtn.addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     let tab = tabs[0].url;
-
     let quesName = quesNameEl.value ? quesNameEl.value : tab;
 
     clearInputs();
@@ -47,6 +59,7 @@ tabBtn.addEventListener("click", () => {
       id: crypto.randomUUID(),
       url: tab,
       name: quesName,
+      status:false
     });
 
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
@@ -65,19 +78,16 @@ document.addEventListener("DOMContentLoaded", () => {
   refreshHeading();
 });
 
-/* ================= MODIFIED FUNCTIONS ================= */
+/* =============== SINGLE REUSABLE FUNCTION =============== */
 
-function showQuestion() {
-  const question = myQuestions[myQuestions.length - 1];
-
+function createQuestionElement(question) {
   const li = document.createElement("li");
 
-  // 🔴 SVG-only delete button (no behavior)
   const del = document.createElement("button");
-  del.type = "button"; // prevents form / default behavior
+  del.type = "button";
   del.classList.add("del-btn");
-  del.innerHTML =
-    "<img src='del.svg' alt='delete icon' class='del-svg'>";
+  del.innerHTML = "<img src='del.svg' class='del-svg'>";
+  del.addEventListener("click", () => deleteQuestion(question.id, li));
 
   const label = document.createElement("label");
   label.classList.add("checkbox");
@@ -98,70 +108,53 @@ function showQuestion() {
   svg.appendChild(path);
   customBox.appendChild(svg);
 
+
   const link = document.createElement("a");
   link.href = question.url;
   link.target = "_blank";
   link.textContent = getQuestionName(question);
+  link.addEventListener("click", e => e.stopPropagation()); // to prevent checkbox checking when link is clicked
+
+
+  if(question.status){
+    input.checked=true;
+    lineThrough(input,link,question);
+  }
+
+  input.addEventListener("change",()=>{lineThrough(input,link,question)});
+
 
   label.append(input, customBox, link);
-  li.appendChild(label);
-  li.appendChild(del);
-  ulEl.appendChild(li);
+  li.append(label, del);
+
+  return li;
+}
+
+/* ================= SIMPLIFIED FUNCTIONS ================= */
+
+function showQuestion() {
+  const question = myQuestions[myQuestions.length - 1];
+  ulEl.appendChild(createQuestionElement(question));
 }
 
 function renderQuestions() {
   ulEl.innerHTML = "";
-
   const fragment = document.createDocumentFragment();
 
   for (let question of myQuestions) {
-    const li = document.createElement("li");
-
-    // 🔴 SVG-only delete button (no behavior)
-    const del = document.createElement("button");
-    del.type = "button";
-    del.classList.add("del-btn");
-    del.innerHTML =
-      "<img src='del.svg' alt='delete icon' class='del-svg'>";
-
-    const label = document.createElement("label");
-    label.classList.add("checkbox");
-
-    const input = document.createElement("input");
-    input.type = "checkbox";
-
-    const customBox = document.createElement("span");
-    customBox.classList.add("custom-box");
-
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.classList.add("check-icon");
-
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", "M5 13l4 4L19 7");
-
-    svg.appendChild(path);
-    customBox.appendChild(svg);
-
-    const link = document.createElement("a");
-    link.href = question.url;
-    link.target = "_blank";
-    link.textContent = getQuestionName(question);
-
-    label.append(input, customBox, link);
-    li.appendChild(label);
-    li.appendChild(del);
-    fragment.appendChild(li);
+    fragment.appendChild(createQuestionElement(question));
   }
 
   ulEl.appendChild(fragment);
 }
 
-/* ===================================================== */
+/* ======================================================= */
 
 function refreshHeading() {
-  if (myQuestions.length == 0) heading.innerText = "Nothing to-do 🗑️";
-  else heading.innerText = "Questions to-do:✍️";
+  heading.innerText =
+    myQuestions.length === 0
+      ? "Nothing to-do 🗑️"
+      : "Questions to-do:✍️";
 }
 
 function getQuestionName(question) {
@@ -172,4 +165,29 @@ function clearInputs() {
   inputEl.value = "";
   quesNameEl.value = "";
   localStorage.removeItem("quesNameInput");
+}
+
+function deleteQuestion(id, li) {
+  li.classList.add("deleting");
+
+  setTimeout(() => {
+    myQuestions = myQuestions.filter(q => q.id !== id);
+    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+    li.remove();
+    refreshHeading();
+  }, 300);
+}
+
+function lineThrough(input,link,question){
+  if(input.checked){
+    link.classList.add("checked");
+    question.status=true;
+    localStorage.setItem("myQuestions",JSON.stringify(myQuestions));
+
+  }
+  else {
+    link.classList.remove("checked");
+    question.status=false;
+    localStorage.setItem("myQuestions",JSON.stringify(myQuestions));
+  }
 }
