@@ -4,8 +4,8 @@ body {
     padding: 14px;
     width: 400px;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #000000, #152227, #000503);
-    color: #eaeaea;
+    background: linear-gradient(135deg, #FFFEF2, #FFF9E0);
+    color: #333333;
     min-width: 420px;
 }
 
@@ -15,7 +15,7 @@ body {
     text-align: center;
     font-size: 1.3rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #A81B1B;
 }
 
 #head {
@@ -23,7 +23,7 @@ body {
     margin-top: 1px;
     margin-bottom: 40px;
     text-align: center;
-    color: #f9c1c1;
+    color: #A81B1B;
 }
 
 /* ✏️ TEXT INPUTS ONLY */
@@ -34,9 +34,9 @@ input[type="url"] {
     font-size: 0.95rem;
     font-weight: 600;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    border: 2px solid #9CB34E;
+    background: #FFFEF2;
+    color: #333333;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     box-sizing: border-box;
@@ -44,7 +44,7 @@ input[type="url"] {
 }
 
 input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: #888888;
 }
 
 /* ✨ Input effects */
@@ -54,10 +54,10 @@ input[type="url"]:hover,
 input[type="url"]:focus {
     transform: translateY(-4px);
     outline: none;
-    border: 1px solid #4ade80;
+    border: 2px solid #F2D86D;
     box-shadow:
-        0 0 10px rgba(74, 222, 128, 0.6),
-        0 0 20px rgba(96, 165, 250, 0.6);
+        0 0 10px rgba(242, 216, 109, 0.6),
+        0 0 20px rgba(156, 179, 78, 0.4);
 }
 
 #name {
@@ -80,8 +80,8 @@ input[type="url"]:focus {
     border-radius: 12px;
     border: none;
     cursor: pointer;
-    color: rgb(0, 0, 0);
-    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: #333333;
+    background: linear-gradient(135deg, #F2D86D, #E6C84D);
     transition: transform 0.12s ease, box-shadow 0.15s ease;
     display: inline-flex;
     align-items: center;
@@ -104,13 +104,15 @@ input[type="url"]:focus {
 
 /* 🗑 Delete button */
 #delete-btn {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, #A81B1B, #8B1515);
+    color: #FFFEF2;
 }
 
 /* 📌 Tab button */
 #tab-btn {
     padding: 10px;
-    background: linear-gradient(135deg, #9dc3ff, #0784d2);
+    background: linear-gradient(135deg, #9CB34E, #7A9040);
+    color: #FFFEF2;
 }
 
 /* 📃 List */
@@ -125,7 +127,8 @@ li {
     margin-top: 6px;
     padding: 8px 10px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(242, 216, 109, 0.25);
+    border: 1px solid rgba(156, 179, 78, 0.3);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     transition: all 0.3s ease;
@@ -141,8 +144,8 @@ li {
     bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%) scale(0.9);
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    color: #4ade80;
+    background: linear-gradient(135deg, #A81B1B, #8B1515);
+    color: #FFFEF2;
     padding: 10px 14px;
     border-radius: 10px;
     font-size: 0.75rem;
@@ -151,8 +154,8 @@ li {
     max-width: 350px;
     overflow: hidden;
     text-overflow: ellipsis;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(74, 222, 128, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(168, 27, 27, 0.4);
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s ease;
@@ -167,7 +170,7 @@ li {
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: #0f172a;
+    border-top-color: #8B1515;
 }
 
 /* Link wrapper for tooltip positioning */
@@ -191,8 +194,8 @@ li.deleting {
 
 li:hover {
     transform: scale(1.04) translateY(-5px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    background: rgba(242, 216, 109, 0.45);
 }
 
 li.deleting:hover {
@@ -203,7 +206,7 @@ li.deleting:hover {
 a {
     font-size: 16px;
     text-decoration: none;
-    color: rgb(99, 227, 40);
+    color: #A81B1B;
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -234,7 +237,7 @@ a:hover {
 .custom-box {
     width: 20px;
     height: 20px;
-    border: 2px solid #4ade80;
+    border: 2px solid #9CB34E;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -246,8 +249,8 @@ a:hover {
 /* hover glow */
 .checkbox:hover .custom-box {
     transform: translateY(-2px);
-    background: rgba(74, 222, 128, 0.2);
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+    background: rgba(156, 179, 78, 0.2);
+    box-shadow: 0 0 8px rgba(156, 179, 78, 0.5);
 }
 
 /* checkmark SVG */
@@ -266,8 +269,8 @@ a:hover {
 
 /* show ✔ when checked */
 .checkbox input:checked + .custom-box {
-    background: #4ade80;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
+    background: #9CB34E;
+    box-shadow: 0 0 10px rgba(156, 179, 78, 0.8);
 }
 
 .checkbox input:checked + .custom-box .check-icon {
@@ -327,14 +330,14 @@ a:hover {
     top: 20px;
     left: 50%;
     transform: translateX(-50%) translateY(-100px);
-    background: linear-gradient(135deg, #1e293b, #334155);
-    color: #fbbf24;
+    background: linear-gradient(135deg, #A81B1B, #8B1515);
+    color: #FFFEF2;
     padding: 12px 20px;
     border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 600;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(251, 191, 36, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(168, 27, 27, 0.4);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
