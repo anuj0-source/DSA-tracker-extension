@@ -6,7 +6,7 @@ body {
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     background: linear-gradient(135deg, #000000, #152227, #000503);
     color: #eaeaea;
-    min-height: 400px;
+    min-width: 420px;
 }
 
 /* 🔤 Heading */
@@ -75,7 +75,7 @@ input[type="url"]:focus {
 /* 🔘 Utility Buttons */
 .utility-btn {
     padding: 10px 12px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 700;
     border-radius: 12px;
     border: none;
@@ -151,6 +151,7 @@ li.deleting:hover {
 
 /* 🔗 Links */
 a {
+    font-size: 16px;
     text-decoration: none;
     color: rgb(99, 227, 40);
     font-weight: 600;
