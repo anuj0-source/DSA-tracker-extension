@@ -1,6 +1,6 @@
-# DSA Tracker 📊
+# Problem Tracker 📊
 
-A Chrome extension to help you track and manage Data Structures & Algorithms (DSA) practice questions. Save questions from any website and keep track of your coding interview preparation progress.
+A Chrome extension to help you track and manage coding practice questions. Save questions from any website and keep track of your coding interview preparation progress.
 
 ## Features ✨
 
@@ -17,7 +17,7 @@ A Chrome extension to help you track and manage Data Structures & Algorithms (DS
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable **Developer mode** (toggle in the top right)
 4. Click **Load unpacked** and select the project folder
-5. The DSA Tracker extension will appear in your browser toolbar
+5. The Problem Tracker extension will appear in your browser toolbar
 
 ## Usage 📖
 
@@ -27,7 +27,7 @@ A Chrome extension to help you track and manage Data Structures & Algorithms (DS
 3. Click **Save question**
 
 ### Save Current Tab
-1. Navigate to any DSA question page (LeetCode, HackerRank, etc.)
+1. Navigate to any coding question page (LeetCode, HackerRank, etc.)
 2. Click the extension icon
 3. Optionally enter a custom name
 4. Click **Save current tab**
@@ -46,7 +46,7 @@ A Chrome extension to help you track and manage Data Structures & Algorithms (DS
 ## File Structure 📁
 
 ```
-DSA-tracker/
+Problem-tracker/
 ├── index.html      # Extension popup UI
 ├── index.css       # Styles with modern dark theme
 ├── index.js        # Core functionality and logic

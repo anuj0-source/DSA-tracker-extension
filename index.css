@@ -2,7 +2,7 @@
 body {
     margin: 0;
     padding: 14px;
-    min-width: 400px;
+    width: 400px;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     background: linear-gradient(135deg, #000000, #152227, #000503);
     color: #eaeaea;
@@ -132,6 +132,56 @@ li {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
+}
+
+/* 💬 Tooltip */
+.tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #4ade80;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #0f172a;
+}
+
+/* Link wrapper for tooltip positioning */
+.link-wrapper {
+    position: relative;
+    display: inline-flex;
+    min-width: 0;
+    flex: 1;
+}
+
+.link-wrapper:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
 }
 
 li.deleting {
@@ -158,6 +208,8 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 280px;
+    display: block;
 }
 
 a:hover {
@@ -261,6 +313,8 @@ a:hover {
 #header-icon {
     width: 40px;
     height: 40px;
+    vertical-align: middle;
+    margin-left: 4px;
 }
 
 .checked{

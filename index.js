@@ -140,6 +140,15 @@ function createQuestionElement(question) {
   link.textContent = getQuestionName(question);
   link.addEventListener("click", e => e.stopPropagation()); // to prevent checkbox checking when link is clicked
 
+  // Tooltip for full URL
+  const tooltip = document.createElement("span");
+  tooltip.classList.add("tooltip");
+  tooltip.textContent = question.url;
+
+  // Wrap link and tooltip
+  const linkWrapper = document.createElement("span");
+  linkWrapper.classList.add("link-wrapper");
+  linkWrapper.append(link, tooltip);
 
   if(question.status){
     input.checked=true;
@@ -149,7 +158,7 @@ function createQuestionElement(question) {
   input.addEventListener("change",()=>{lineThrough(input,link,question)});
 
 
-  label.append(input, customBox, link);
+  label.append(input, customBox, linkWrapper);
   li.append(label, del);
 
   return li;
