@@ -10,7 +10,7 @@ const deleteBtn = document.querySelector("#delete-btn");
 const tabBtn = document.querySelector("#tab-btn");
 const heading = document.querySelector("#heading");
 const quesNameEl = document.querySelector("#name");
-const revisionUlEl = document.querySelector(".revision-list");
+const revisionUlEl = document.querySelector("#revision-ul-el");
 const revHeading = document.querySelector("#rev-heading");
 
 inputBtn.addEventListener("click", function () {
@@ -197,7 +197,8 @@ function createQuestionElement(question) {
   //tool tip for revision
   const revtooltip=document.createElement("span");
   revtooltip.classList.add("rev-tooltip");
-  revtooltip.textContent="Mark for revision";
+  if(question.revision) revtooltip.textContent="Remove from revision";
+  else revtooltip.textContent="Mark for revision";
 
   //wrap link and tool tip for revision tooltip
   const revlinkwrapper=document.createElement("span");
@@ -270,6 +271,11 @@ function refreshHeading() {
     myQuestions.length === 0
       ? "Nothing to-do 🗑️"
       : "Questions to-do:✍️";
+
+      revHeading.innerText=
+      revisionList.length === 0?
+      "Nothing to revise 🗑️":
+      "Questions to revise 💡";
 }
 
 function getQuestionName(question) {
@@ -319,7 +325,7 @@ function lineThrough(input, link, question,starLabel) {
     question.status = false;
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
     localStorage.setItem("revisionList", JSON.stringify(revisionList));
-    starLabel.style.display="none";
+    if(!question.revision) starLabel.style.display="none";
   }
 }
 
