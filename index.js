@@ -46,16 +46,27 @@ quesNameEl.addEventListener("input", () => {
 
 deleteBtn.addEventListener("click", () => {
   const items = ulEl.querySelectorAll("li");
+  const revItems=revisionUlEl.querySelectorAll("li");
 
-  if (items.length === 0) return;
+  if (items.length === 0 && revItems.length === 0) return;
+  if(items.length != 0){
+    set = set.clear();
 
-  set = new Set();
-
-  items.forEach((li, index) => {
+    items.forEach((li, index) => {
     setTimeout(() => {
       li.classList.add("deleting");
     }, index * 50); // stagger animation
-  });
+    });
+  }
+  if(revItems.length !== 0){
+    revSet=revSet.clear();
+    
+    revItems.forEach((li, index) => {
+    setTimeout(() => {
+      li.classList.add("deleting");
+    }, index * 50); // stagger animation
+    });
+  }
 
   setTimeout(() => {
     localStorage.removeItem("myQuestions");
@@ -63,6 +74,13 @@ deleteBtn.addEventListener("click", () => {
     ulEl.innerHTML = "";
     refreshHeading();
   }, items.length * 50 + 300);
+
+  setTimeout(() => {
+    localStorage.removeItem("revisionList");
+    revisionList=[];
+    revisionUlEl.innerHTML="";
+    refreshHeading();
+  }, revItems.length * 50 + 300)
 
 });
 
