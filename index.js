@@ -1,5 +1,7 @@
 let myQuestions = [];
+let revisionList = [];
 let set = new Set();
+let revSet = new Set();
 
 const inputEl = document.getElementById("input-el");
 const inputBtn = document.getElementById("input-btn");
@@ -8,6 +10,8 @@ const deleteBtn = document.querySelector("#delete-btn");
 const tabBtn = document.querySelector("#tab-btn");
 const heading = document.querySelector("#heading");
 const quesNameEl = document.querySelector("#name");
+const revisionUlEl = document.querySelector(".revision-list");
+const revHeading = document.querySelector("#rev-heading");
 
 inputBtn.addEventListener("click", function () {
   if (inputEl.value === "") {
@@ -15,7 +19,7 @@ inputBtn.addEventListener("click", function () {
     return;
   }
 
-  if (set.has(inputEl.value)) {
+  if (set.has(inputEl.value) || revSet.has(inputEl.value)) {
     showToast("⚠️ This question already exists!");
     return;
   }
@@ -24,7 +28,8 @@ inputBtn.addEventListener("click", function () {
     id: crypto.randomUUID(),
     url: inputEl.value,
     name: quesNameEl.value,
-    status: false
+    status: false,
+    revision: false
   });
 
   set.add(inputEl.value);
@@ -66,7 +71,7 @@ tabBtn.addEventListener("click", () => {
     let tab = tabs[0].url;
     let quesName = quesNameEl.value ? quesNameEl.value : findQuesName(tab);
 
-    if (set.has(tab)) {
+    if (set.has(tab) || revSet.has(tab)) {
       showToast("⚠️ This question already exists!");
       return;
     }
@@ -80,7 +85,8 @@ tabBtn.addEventListener("click", () => {
       id: crypto.randomUUID(),
       url: tab,
       name: quesName,
-      status: false
+      status: false,
+      revision: false
     });
 
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
@@ -93,12 +99,21 @@ document.addEventListener("DOMContentLoaded", () => {
   quesNameEl.value = localStorage.getItem("quesNameInput") || "";
 
   const storedQuestions = JSON.parse(localStorage.getItem("myQuestions"));
+  const storedRevision=JSON.parse(localStorage.getItem("revisionList"));
   if (storedQuestions) {
     myQuestions = storedQuestions;
     myQuestions.forEach(q => set.add(q.url)); // 🔥 FIX
   }
 
+  if(storedRevision){
+    revisionList=storedRevision;
+    revisionList.forEach(q=>{
+      revSet.add(q.url);
+    })
+  }
+
   renderQuestions();
+  renderRevisions();
   refreshHeading();
 });
 
@@ -112,7 +127,36 @@ function createQuestionElement(question) {
   del.type = "button";
   del.classList.add("del-btn");
   del.innerHTML = "<img src='del.svg' class='del-svg'>";
-  del.addEventListener("click", () => deleteQuestion(question.id, li));
+  del.addEventListener("click", () => deleteQuestion(question, li));
+
+  // creating star element for revision button
+  const starLabel = document.createElement("label");
+  starLabel.classList.add("star-checkbox");
+  starLabel.style.display="none";
+
+  const star = document.createElement("input");
+  star.type = "checkbox";
+  star.classList.add("star-box")
+  
+  const starSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  starSvg.classList.add("star-svg");
+  starSvg.setAttribute("viewBox", "0 0 24 24");
+
+  const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  polygon.setAttribute(
+    "points",
+    "12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"
+  );
+
+  starSvg.appendChild(polygon);
+  starLabel.append(star,starSvg);
+
+  star.addEventListener("change",()=>{addToRevision(question,star,li)});
+
+  if(question.revision){
+    starLabel.style.display="inline-flex";
+    star.checked=true;
+  }
 
   const label = document.createElement("label");
   label.classList.add("checkbox");
@@ -150,16 +194,40 @@ function createQuestionElement(question) {
   linkWrapper.classList.add("link-wrapper");
   linkWrapper.append(link, tooltip);
 
+  //tool tip for revision
+  const revtooltip=document.createElement("span");
+  revtooltip.classList.add("rev-tooltip");
+  revtooltip.textContent="Mark for revision";
+
+  //wrap link and tool tip for revision tooltip
+  const revlinkwrapper=document.createElement("span");
+  revlinkwrapper.classList.add("rev-wrapper");
+  revlinkwrapper.append(revtooltip,starLabel);
+
+  //tooltip for delete button
+  const deltooltip=document.createElement("span");
+  deltooltip.classList.add("del-tooltip");
+  deltooltip.textContent="Delete";
+
+  // wrapper for del button and tooltip
+  const delwrapper=document.createElement("span");
+  delwrapper.classList.add("del-wrapper");
+  delwrapper.append(del,deltooltip);
+
+
   if (question.status) {
     input.checked = true;
-    lineThrough(input, link, question);
+    lineThrough(input, link, question,starLabel);
   }
 
-  input.addEventListener("change", () => { lineThrough(input, link, question) });
+  
+
+  input.addEventListener("change", () => { lineThrough(input, link, question,starLabel) });
 
 
   label.append(input, customBox, linkWrapper);
-  li.append(label, del);
+  li.append(label, revlinkwrapper, delwrapper);
+
 
   return li;
 }
@@ -182,6 +250,19 @@ function renderQuestions() {
   ulEl.appendChild(fragment);
 }
 
+function renderRevisions(){
+  const fragment=document.createDocumentFragment();
+
+  revisionUlEl.innerHTML="";
+
+  for(let question of revisionList){
+    fragment.appendChild(createQuestionElement(question));
+  }
+
+  revisionUlEl.appendChild(fragment);
+
+}
+
 /* ======================================================= */
 
 function refreshHeading() {
@@ -201,32 +282,44 @@ function clearInputs() {
   localStorage.removeItem("quesNameInput");
 }
 
-function deleteQuestion(id, li) {
+function deleteQuestion(question, li) {
   li.classList.add("deleting");
 
   setTimeout(() => {
-    const removed = myQuestions.find(q => q.id === id);
+    const removed = myQuestions.find(q => q.id === question.id);
     if (removed) set.delete(removed.url); // 🔥 FIX
 
-    myQuestions = myQuestions.filter(q => q.id !== id);
-    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+    if(question.revision){
+      revisionList=revisionList.filter(q => q.id !== question.id);
+      localStorage.setItem("revisionList",JSON.stringify(revisionList));
+    }
+    else {
+      myQuestions = myQuestions.filter(q => q.id !== question.id);
+      localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+
+    }
+
     li.remove();
     refreshHeading();
   }, 300);
 }
 
 
-function lineThrough(input, link, question) {
+function lineThrough(input, link, question,starLabel) {
   if (input.checked) {
     link.classList.add("checked");
     question.status = true;
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+    localStorage.setItem("revisionList", JSON.stringify(revisionList));
 
+    starLabel.style.display="inline-flex";
   }
   else {
     link.classList.remove("checked");
     question.status = false;
     localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+    localStorage.setItem("revisionList", JSON.stringify(revisionList));
+    starLabel.style.display="none";
   }
 }
 
@@ -244,25 +337,28 @@ function showToast(message) {
 }
 
 function findQuesName(url) {
-  if (url.includes("geeksforgeeks.org") || url.includes("leetcode.com") || url.includes("naukri.com")) {
+  if (url.includes("geeksforgeeks.org") || url.includes("leetcode.com") || url.includes("naukri.com") || url.includes("interviewbit.com")) {
     let i = url.indexOf("problems/");
     let name = "";
     if (i >= 0) {
       i += 9;
-      let start=true;
-      while (
-        isUpperCase(url.charAt(i)) || // A-Z
-        isLowerCase(url.charAt(i)) || // a-z
-        (url.charAt(i) === '-')||
-        (url.charCodeAt(i) >= 48 && url.charCodeAt(i) <= 57 && start)
-      ) {
-        if(start && url.charAt(i) == '-' || isUpperCase(url.charAt(i)) || isLowerCase(url.charAt(i))) start=false;
-        if (url.charAt(i) == '-') name += " ";
-        else name += url.charAt(i);
-        i++;
+      while (i < url.length) {
+        const char = url.charAt(i);
+        const code = url.charCodeAt(i);
+        const isLetter = isUpperCase(char) || isLowerCase(char);
+        const isDigit = code >= 48 && code <= 57;
+        const isHyphen = char === '-';
+
+        if (isLetter || isDigit || isHyphen) {
+          if (isHyphen) name += " ";
+          else name += char;
+          i++;
+        } else {
+          break;
+        }
       }
 
-      return name;
+      return name.trim() || url;
     }
     else return url;
   } else return url;
@@ -278,4 +374,57 @@ function isLowerCase(char) {
   if (!char) return false;
   const code = char.charCodeAt(0);
   return code >= 97 && code <= 122;
+}
+
+function addToRevision(question, star, li) {
+
+  animateRemove(li, () => {
+
+    if (star.checked) {
+      showToast("Marked for revision");
+
+      question.revision = true;
+      question.status = false;
+
+      myQuestions = myQuestions.filter(q => q.id !== question.id);
+      revisionList.push(question);
+
+      set.delete(question.url);
+      revSet.add(question.url);
+    } 
+    else {
+      showToast("Removed from revision");
+
+      question.revision = false;
+      question.status = true;
+
+      revisionList = revisionList.filter(q => q.id !== question.id);
+      myQuestions.push(question);
+
+      revSet.delete(question.url);
+      set.add(question.url);
+    }
+
+    localStorage.setItem("revisionList", JSON.stringify(revisionList));
+    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+
+    refreshHeading();
+    renderQuestions();
+    renderRevisions();
+  });
+}
+
+
+function showRevQuestion(){
+  let q=revisionList[revisionList.length - 1];
+  revisionUlEl.appendChild(createQuestionElement(q));
+}
+
+function animateRemove(li, callback) {
+  li.classList.add("deleting");
+
+  setTimeout(() => {
+    li.remove();
+    callback && callback();
+  }, 300); // match CSS animation duration
 }

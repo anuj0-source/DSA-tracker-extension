@@ -6,5 +6,18 @@
         "default_popup": "index.html",
         "default_icon": "icon.png"
     },
-    "permissions":["tabs"]
+    "permissions": ["tabs", "storage"],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.leetcode.com/problems/*",
+                "*://*.geeksforgeeks.org/problems/*",
+                "*://*.codeforces.com/problemset/problem/*",
+                "*://*.hackerrank.com/challenges/*",
+                "*://*.naukri.com/code360/problems/*"
+            ],
+            "js": ["content.js"],
+            "css": ["content.css"]
+        }
+    ]
 }
