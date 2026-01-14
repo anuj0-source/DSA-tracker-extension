@@ -170,8 +170,8 @@ li {
 .tooltip {
     position: absolute;
     bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) scale(0.9);
+    left: 20%;
+    transform: translateX(-18%) scale(0.9);
     background: linear-gradient(135deg, #1e293b, #0f172a);
     color: #4ade80;
     padding: 10px 14px;
@@ -217,7 +217,7 @@ li {
     content: '';
     position: absolute;
     top: 100%;
-    left: 50%;
+    left: 20%;
     transform: translateX(-50%);
     border: 6px solid transparent;
     border-top-color: #0f172a;
@@ -233,7 +233,7 @@ li {
 .link-wrapper:hover .tooltip {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) scale(1);
+    transform: translateX(-18%) scale(1);
 }
 
 .rev-wrapper {
