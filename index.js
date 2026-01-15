@@ -207,6 +207,23 @@ function createQuestionElement(question) {
   tooltip.classList.add("tooltip");
   tooltip.textContent = question.url;
 
+  // tooltip for mark as done
+
+  const donetooltip=document.createElement("span");
+  donetooltip.classList.add("done-tooltip");
+  if(question.status) donetooltip.innerText="Mark as incomplete";
+  else donetooltip.innerText="Mark as completed";
+
+  //wrapper for checkbox with done tooltip
+  const checkboxWrapper=document.createElement("span");
+  checkboxWrapper.classList.add("done-wrapper");
+  checkboxWrapper.append(input, customBox, donetooltip);
+
+  //wrapper for link
+  const donewrapper=document.createElement("span");
+  donewrapper.classList.add("link-text-wrapper");
+  donewrapper.append(link);
+
   // Wrap link and tooltip
   const linkWrapper = document.createElement("span");
   linkWrapper.classList.add("link-wrapper");
@@ -241,10 +258,14 @@ function createQuestionElement(question) {
 
   
 
-  input.addEventListener("change", () => { lineThrough(input, link, question,starLabel) });
+  input.addEventListener("change", () => { 
+    lineThrough(input, link, question,starLabel);
+    // Update tooltip text based on new status
+    donetooltip.innerText = question.status ? "Mark as incomplete" : "Mark as completed";
+  });
 
 
-  label.append(input, customBox, linkWrapper);
+  label.append(checkboxWrapper, linkWrapper);
   li.append(label, revlinkwrapper, delwrapper);
 
 
