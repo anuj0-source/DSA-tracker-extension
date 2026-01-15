@@ -50,7 +50,7 @@ deleteBtn.addEventListener("click", () => {
 
   if (items.length === 0 && revItems.length === 0) return;
   if(items.length != 0){
-    set = set.clear();
+    set.clear();
 
     items.forEach((li, index) => {
     setTimeout(() => {
@@ -59,7 +59,7 @@ deleteBtn.addEventListener("click", () => {
     });
   }
   if(revItems.length !== 0){
-    revSet=revSet.clear();
+    revSet.clear();
     
     revItems.forEach((li, index) => {
     setTimeout(() => {
