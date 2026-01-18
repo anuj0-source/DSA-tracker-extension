@@ -1,3 +1,25 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+
+import { getDatabase } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+import {ref,push} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+const firebaseConfig={
+
+  databaseURL:"https://problem-tracker-a0c50-default-rtdb.asia-southeast1.firebasedatabase.app/"
+
+}
+
+
+const app = initializeApp(firebaseConfig);
+
+const database=getDatabase(app);
+
+if(database) console.log("Database Connected!")
+
+const referenceDB=ref(database,"problemsDB");
+
+
 let myQuestions = [];
 let revisionList = [];
 let set = new Set();
