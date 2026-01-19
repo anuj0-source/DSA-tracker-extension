@@ -57,7 +57,7 @@ inputBtn.addEventListener("click", function () {
   set.add(inputEl.value);
 
   clearInputs();
-  localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+  push(referenceDB,inputEl.value); // add to firebase db
   showQuestion();
   refreshHeading();
 });
