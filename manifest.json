@@ -6,18 +6,30 @@
         "default_popup": "index.html",
         "default_icon": "icon.png"
     },
-    "permissions": ["tabs", "storage"],
+    "permissions": [
+        "tabs",
+        "storage"
+    ],
     "content_scripts": [
         {
             "matches": [
+                "*://leetcode.com/problems/*",
                 "*://*.leetcode.com/problems/*",
+                "*://geeksforgeeks.org/problems/*",
                 "*://*.geeksforgeeks.org/problems/*",
+                "*://codeforces.com/problemset/problem/*",
                 "*://*.codeforces.com/problemset/problem/*",
+                "*://hackerrank.com/challenges/*",
                 "*://*.hackerrank.com/challenges/*",
+                "*://naukri.com/code360/problems/*",
                 "*://*.naukri.com/code360/problems/*"
             ],
-            "js": ["content.js"],
-            "css": ["content.css"]
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
+            ]
         }
     ]
 }

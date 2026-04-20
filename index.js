@@ -3,6 +3,8 @@ let revisionList = [];
 let set = new Set();
 let revSet = new Set();
 
+const STORAGE_KEYS = ["myQuestions", "revisionList"];
+
 const inputEl = document.getElementById("input-el");
 const inputBtn = document.getElementById("input-btn");
 const ulEl = document.querySelector("#ul-el");
@@ -12,6 +14,66 @@ const heading = document.querySelector("#heading");
 const quesNameEl = document.querySelector("#name");
 const revisionUlEl = document.querySelector("#revision-ul-el");
 const revHeading = document.querySelector("#rev-heading");
+
+function safeParseArray(value) {
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function hasChromeStorage() {
+  return typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+}
+
+function persistCollections() {
+  localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+  localStorage.setItem("revisionList", JSON.stringify(revisionList));
+
+  if (hasChromeStorage()) {
+    chrome.storage.local.set({ myQuestions, revisionList });
+  }
+}
+
+function rebuildUrlSets() {
+  set.clear();
+  revSet.clear();
+
+  myQuestions.forEach((q) => {
+    if (q?.url) set.add(q.url);
+  });
+
+  revisionList.forEach((q) => {
+    if (q?.url) revSet.add(q.url);
+  });
+}
+
+function initializeCollections(callback) {
+  const fallbackQuestions = safeParseArray(localStorage.getItem("myQuestions"));
+  const fallbackRevision = safeParseArray(localStorage.getItem("revisionList"));
+
+  if (!hasChromeStorage()) {
+    myQuestions = fallbackQuestions;
+    revisionList = fallbackRevision;
+    rebuildUrlSets();
+    callback();
+    return;
+  }
+
+  chrome.storage.local.get(STORAGE_KEYS, (stored) => {
+    const storedQuestions = Array.isArray(stored.myQuestions) ? stored.myQuestions : null;
+    const storedRevision = Array.isArray(stored.revisionList) ? stored.revisionList : null;
+
+    myQuestions = storedQuestions ?? fallbackQuestions;
+    revisionList = storedRevision ?? fallbackRevision;
+
+    rebuildUrlSets();
+    persistCollections();
+    callback();
+  });
+}
 
 inputBtn.addEventListener("click", function () {
   if (inputEl.value === "") {
@@ -35,7 +97,7 @@ inputBtn.addEventListener("click", function () {
   set.add(inputEl.value);
 
   clearInputs();
-  localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+  persistCollections();
   showQuestion();
   refreshHeading();
 });
@@ -46,39 +108,39 @@ quesNameEl.addEventListener("input", () => {
 
 deleteBtn.addEventListener("click", () => {
   const items = ulEl.querySelectorAll("li");
-  const revItems=revisionUlEl.querySelectorAll("li");
+  const revItems = revisionUlEl.querySelectorAll("li");
 
   if (items.length === 0 && revItems.length === 0) return;
-  if(items.length != 0){
+  if (items.length != 0) {
     set.clear();
 
     items.forEach((li, index) => {
-    setTimeout(() => {
-      li.classList.add("deleting");
-    }, index * 50); // stagger animation
+      setTimeout(() => {
+        li.classList.add("deleting");
+      }, index * 50); // stagger animation
     });
   }
-  if(revItems.length !== 0){
+  if (revItems.length !== 0) {
     revSet.clear();
-    
+
     revItems.forEach((li, index) => {
-    setTimeout(() => {
-      li.classList.add("deleting");
-    }, index * 50); // stagger animation
+      setTimeout(() => {
+        li.classList.add("deleting");
+      }, index * 50); // stagger animation
     });
   }
 
   setTimeout(() => {
-    localStorage.removeItem("myQuestions");
     myQuestions = [];
+    persistCollections();
     ulEl.innerHTML = "";
     refreshHeading();
   }, items.length * 50 + 300);
 
   setTimeout(() => {
-    localStorage.removeItem("revisionList");
-    revisionList=[];
-    revisionUlEl.innerHTML="";
+    revisionList = [];
+    persistCollections();
+    revisionUlEl.innerHTML = "";
     refreshHeading();
   }, revItems.length * 50 + 300)
 
@@ -107,7 +169,7 @@ tabBtn.addEventListener("click", () => {
       revision: false
     });
 
-    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+    persistCollections();
     showQuestion();
     refreshHeading();
   });
@@ -116,23 +178,26 @@ tabBtn.addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", () => {
   quesNameEl.value = localStorage.getItem("quesNameInput") || "";
 
-  const storedQuestions = JSON.parse(localStorage.getItem("myQuestions"));
-  const storedRevision=JSON.parse(localStorage.getItem("revisionList"));
-  if (storedQuestions) {
-    myQuestions = storedQuestions;
-    myQuestions.forEach(q => set.add(q.url)); // 🔥 FIX
-  }
+  initializeCollections(() => {
+    renderQuestions();
+    renderRevisions();
+    refreshHeading();
+  });
 
-  if(storedRevision){
-    revisionList=storedRevision;
-    revisionList.forEach(q=>{
-      revSet.add(q.url);
-    })
-  }
+  if (hasChromeStorage()) {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== "local") return;
+      if (!changes.myQuestions && !changes.revisionList) return;
 
-  renderQuestions();
-  renderRevisions();
-  refreshHeading();
+      myQuestions = Array.isArray(changes.myQuestions?.newValue) ? changes.myQuestions.newValue : myQuestions;
+      revisionList = Array.isArray(changes.revisionList?.newValue) ? changes.revisionList.newValue : revisionList;
+
+      rebuildUrlSets();
+      renderQuestions();
+      renderRevisions();
+      refreshHeading();
+    });
+  }
 });
 
 
@@ -150,12 +215,12 @@ function createQuestionElement(question) {
   // creating star element for revision button
   const starLabel = document.createElement("label");
   starLabel.classList.add("star-checkbox");
-  starLabel.style.display="none";
+  starLabel.style.display = "none";
 
   const star = document.createElement("input");
   star.type = "checkbox";
   star.classList.add("star-box")
-  
+
   const starSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   starSvg.classList.add("star-svg");
   starSvg.setAttribute("viewBox", "0 0 24 24");
@@ -167,13 +232,13 @@ function createQuestionElement(question) {
   );
 
   starSvg.appendChild(polygon);
-  starLabel.append(star,starSvg);
+  starLabel.append(star, starSvg);
 
-  star.addEventListener("change",()=>{addToRevision(question,star,li)});
+  star.addEventListener("change", () => { addToRevision(question, star, li) });
 
-  if(question.revision){
-    starLabel.style.display="inline-flex";
-    star.checked=true;
+  if (question.revision) {
+    starLabel.style.display = "inline-flex";
+    star.checked = true;
   }
 
   const label = document.createElement("label");
@@ -209,18 +274,18 @@ function createQuestionElement(question) {
 
   // tooltip for mark as done
 
-  const donetooltip=document.createElement("span");
+  const donetooltip = document.createElement("span");
   donetooltip.classList.add("done-tooltip");
-  if(question.status) donetooltip.innerText="Mark as incomplete";
-  else donetooltip.innerText="Mark as completed";
+  if (question.status) donetooltip.innerText = "Mark as incomplete";
+  else donetooltip.innerText = "Mark as completed";
 
   //wrapper for checkbox with done tooltip
-  const checkboxWrapper=document.createElement("span");
+  const checkboxWrapper = document.createElement("span");
   checkboxWrapper.classList.add("done-wrapper");
   checkboxWrapper.append(input, customBox, donetooltip);
 
   //wrapper for link
-  const donewrapper=document.createElement("span");
+  const donewrapper = document.createElement("span");
   donewrapper.classList.add("link-text-wrapper");
   donewrapper.append(link);
 
@@ -230,36 +295,36 @@ function createQuestionElement(question) {
   linkWrapper.append(link, tooltip);
 
   //tool tip for revision
-  const revtooltip=document.createElement("span");
+  const revtooltip = document.createElement("span");
   revtooltip.classList.add("rev-tooltip");
-  if(question.revision) revtooltip.textContent="Remove from revision";
-  else revtooltip.textContent="Mark for revision";
+  if (question.revision) revtooltip.textContent = "Remove from revision";
+  else revtooltip.textContent = "Mark for revision";
 
   //wrap link and tool tip for revision tooltip
-  const revlinkwrapper=document.createElement("span");
+  const revlinkwrapper = document.createElement("span");
   revlinkwrapper.classList.add("rev-wrapper");
-  revlinkwrapper.append(revtooltip,starLabel);
+  revlinkwrapper.append(revtooltip, starLabel);
 
   //tooltip for delete button
-  const deltooltip=document.createElement("span");
+  const deltooltip = document.createElement("span");
   deltooltip.classList.add("del-tooltip");
-  deltooltip.textContent="Delete";
+  deltooltip.textContent = "Delete";
 
   // wrapper for del button and tooltip
-  const delwrapper=document.createElement("span");
+  const delwrapper = document.createElement("span");
   delwrapper.classList.add("del-wrapper");
-  delwrapper.append(del,deltooltip);
+  delwrapper.append(del, deltooltip);
 
 
   if (question.status) {
     input.checked = true;
-    lineThrough(input, link, question,starLabel);
+    lineThrough(input, link, question, starLabel);
   }
 
-  
 
-  input.addEventListener("change", () => { 
-    lineThrough(input, link, question,starLabel);
+
+  input.addEventListener("change", () => {
+    lineThrough(input, link, question, starLabel);
     // Update tooltip text based on new status
     donetooltip.innerText = question.status ? "Mark as incomplete" : "Mark as completed";
   });
@@ -290,12 +355,12 @@ function renderQuestions() {
   ulEl.appendChild(fragment);
 }
 
-function renderRevisions(){
-  const fragment=document.createDocumentFragment();
+function renderRevisions() {
+  const fragment = document.createDocumentFragment();
 
-  revisionUlEl.innerHTML="";
+  revisionUlEl.innerHTML = "";
 
-  for(let question of revisionList){
+  for (let question of revisionList) {
     fragment.appendChild(createQuestionElement(question));
   }
 
@@ -311,9 +376,9 @@ function refreshHeading() {
       ? "Nothing to-do 🗑️"
       : "Questions to-do:✍️";
 
-      revHeading.innerText=
-      revisionList.length === 0?
-      "Nothing to revise 🗑️":
+  revHeading.innerText =
+    revisionList.length === 0 ?
+      "Nothing to revise 🗑️" :
       "Questions to revise 💡";
 }
 
@@ -334,15 +399,14 @@ function deleteQuestion(question, li) {
     const removed = myQuestions.find(q => q.id === question.id);
     if (removed) set.delete(removed.url); // 🔥 FIX
 
-    if(question.revision){
-      revisionList=revisionList.filter(q => q.id !== question.id);
-      localStorage.setItem("revisionList",JSON.stringify(revisionList));
+    if (question.revision) {
+      revisionList = revisionList.filter(q => q.id !== question.id);
     }
     else {
       myQuestions = myQuestions.filter(q => q.id !== question.id);
-      localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
-
     }
+
+    persistCollections();
 
     li.remove();
     refreshHeading();
@@ -350,21 +414,19 @@ function deleteQuestion(question, li) {
 }
 
 
-function lineThrough(input, link, question,starLabel) {
+function lineThrough(input, link, question, starLabel) {
   if (input.checked) {
     link.classList.add("checked");
     question.status = true;
-    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
-    localStorage.setItem("revisionList", JSON.stringify(revisionList));
+    persistCollections();
 
-    starLabel.style.display="inline-flex";
+    starLabel.style.display = "inline-flex";
   }
   else {
     link.classList.remove("checked");
     question.status = false;
-    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
-    localStorage.setItem("revisionList", JSON.stringify(revisionList));
-    if(!question.revision) starLabel.style.display="none";
+    persistCollections();
+    if (!question.revision) starLabel.style.display = "none";
   }
 }
 
@@ -436,7 +498,7 @@ function addToRevision(question, star, li) {
 
       set.delete(question.url);
       revSet.add(question.url);
-    } 
+    }
     else {
       showToast("Removed from revision");
 
@@ -450,8 +512,7 @@ function addToRevision(question, star, li) {
       set.add(question.url);
     }
 
-    localStorage.setItem("revisionList", JSON.stringify(revisionList));
-    localStorage.setItem("myQuestions", JSON.stringify(myQuestions));
+    persistCollections();
 
     refreshHeading();
     renderQuestions();
@@ -460,8 +521,8 @@ function addToRevision(question, star, li) {
 }
 
 
-function showRevQuestion(){
-  let q=revisionList[revisionList.length - 1];
+function showRevQuestion() {
+  let q = revisionList[revisionList.length - 1];
   revisionUlEl.appendChild(createQuestionElement(q));
 }
 

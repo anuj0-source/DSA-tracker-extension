@@ -2,32 +2,176 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4ade80, #22c55e);
+  background: radial-gradient(circle at 30% 30%, #9af5b8 0%, #39d46d 45%, #1f9e4a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
-  transition: all 0.2s ease;
+  box-shadow:
+    0 6px 16px rgba(19, 124, 63, 0.28),
+    0 1px 6px rgba(15, 23, 42, 0.2);
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 0.24s ease,
+    background 0.24s ease,
+    filter 0.24s ease;
   z-index: 999999;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
   outline: none;
+  isolation: isolate;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+#problem-tracker-fab::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: conic-gradient(from 90deg, rgba(134, 239, 172, 0.25), rgba(34, 197, 94, 0.65), rgba(74, 222, 128, 0.2));
+  filter: blur(8px);
+  z-index: -2;
+  opacity: 0.62;
+  transition: opacity 0.24s ease;
+}
+
+#problem-tracker-fab::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 45%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 #problem-tracker-fab svg {
-  width: 24px;
-  height: 24px;
-  color: #000;
+  width: 23px;
+  height: 23px;
+  color: #052e16;
+}
+
+#problem-tracker-fab .fab-icon {
+  position: absolute;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#problem-tracker-fab .icon-plus {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#problem-tracker-fab .icon-check {
+  opacity: 0;
+  transform: scale(0.72);
 }
 
 #problem-tracker-fab:hover {
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+  transform: scale(1.1) translateY(-1px);
+  box-shadow:
+    0 8px 20px rgba(19, 124, 63, 0.34),
+    0 2px 8px rgba(15, 23, 42, 0.24);
+  filter: saturate(1.06);
 }
 
 #problem-tracker-fab:active {
-  transform: scale(0.95);
+  transform: scale(0.95) translateY(1px);
+}
+
+#problem-tracker-fab[data-state="loading"] {
+  background: radial-gradient(circle at 30% 30%, #b8ecff 0%, #58d0ff 45%, #0ea5e9 100%);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+#problem-tracker-fab[data-state="saved"] {
+  background: radial-gradient(circle at 30% 30%, #b8f8ce 0%, #4ade80 45%, #16a34a 100%);
+}
+
+#problem-tracker-fab[data-state="exists"] {
+  background: radial-gradient(circle at 30% 30%, #b8f8ce 0%, #4ade80 45%, #16a34a 100%);
+}
+
+#problem-tracker-fab[data-state="saved"] .icon-plus,
+#problem-tracker-fab[data-state="exists"] .icon-plus {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+#problem-tracker-fab[data-state="saved"] .icon-check,
+#problem-tracker-fab[data-state="exists"] .icon-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#problem-tracker-fab[data-state="error"] {
+  background: radial-gradient(circle at 30% 30%, #fecaca 0%, #f87171 48%, #dc2626 100%);
+}
+
+#problem-tracker-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: 999999;
+  padding: 11px 14px 11px 16px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #f8fafc;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(17, 24, 39, 0.95));
+  box-shadow:
+    0 8px 16px rgba(2, 6, 23, 0.24),
+    0 1px 6px rgba(2, 6, 23, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+  opacity: 0;
+  transform: translateX(7px) translateY(8px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.24s ease, transform 0.24s cubic-bezier(0.2, 0.9, 0.2, 1);
+  max-width: min(280px, calc(100vw - 48px));
+  overflow: hidden;
+}
+
+#problem-tracker-toast::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: #4ade80;
+}
+
+#problem-tracker-toast.show {
+  opacity: 1;
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+#problem-tracker-toast[data-type="success"] {
+  background: linear-gradient(135deg, rgba(21, 128, 61, 0.92), rgba(22, 163, 74, 0.92));
+}
+
+#problem-tracker-toast[data-type="success"]::before {
+  background: #86efac;
+}
+
+#problem-tracker-toast[data-type="exists"] {
+  background: linear-gradient(135deg, rgba(180, 83, 9, 0.94), rgba(217, 119, 6, 0.94));
+}
+
+#problem-tracker-toast[data-type="exists"]::before {
+  background: #fcd34d;
+}
+
+#problem-tracker-toast[data-type="error"] {
+  background: linear-gradient(135deg, rgba(185, 28, 28, 0.94), rgba(220, 38, 38, 0.94));
+}
+
+#problem-tracker-toast[data-type="error"]::before {
+  background: #fca5a5;
 }
