@@ -46,9 +46,17 @@ if (!document.getElementById("problem-tracker-fab")) {
     fab.title = title;
   }
 
-  function normalizeQuestionUrl(rawUrl) {
+  function normalizePath(path) {
+    let next = path.replace(/\/{2,}/g, "/");
+    if (!next.endsWith("/")) {
+      next += "/";
+    }
+    return next;
+  }
+
+  function parseQuestionUrl(rawUrl) {
     if (!rawUrl || typeof rawUrl !== "string") {
-      return "";
+      return { normalizedUrl: "", matchKey: "" };
     }
 
     try {
@@ -56,50 +64,69 @@ if (!document.getElementById("problem-tracker-fab")) {
       const host = parsed.hostname.toLowerCase();
       const parts = parsed.pathname.split("/").filter(Boolean);
       let normalizedPath = parsed.pathname;
+      let keyPath = parsed.pathname;
 
       if (host.includes("leetcode.com")) {
         const idx = parts.indexOf("problems");
         if (idx >= 0 && parts[idx + 1]) {
           normalizedPath = `/problems/${parts[idx + 1]}/`;
+          keyPath = normalizedPath;
         }
       } else if (host.includes("geeksforgeeks.org")) {
         const idx = parts.indexOf("problems");
         if (idx >= 0 && parts[idx + 1]) {
-          normalizedPath = `/problems/${parts[idx + 1]}/`;
+          const maybeVariant = parts[idx + 2] && /^\d+$/.test(parts[idx + 2]) ? parts[idx + 2] : null;
+          normalizedPath = maybeVariant
+            ? `/problems/${parts[idx + 1]}/${maybeVariant}/`
+            : `/problems/${parts[idx + 1]}/`;
+          keyPath = `/problems/${parts[idx + 1]}/`;
         }
       } else if (host.includes("hackerrank.com")) {
         const idx = parts.indexOf("challenges");
         if (idx >= 0 && parts[idx + 1]) {
           normalizedPath = `/challenges/${parts[idx + 1]}/`;
+          keyPath = normalizedPath;
         }
       } else if (host.includes("codeforces.com")) {
         if (parts[0] === "problemset" && parts[1] === "problem" && parts[2] && parts[3]) {
           normalizedPath = `/problemset/problem/${parts[2]}/${parts[3]}/`;
+          keyPath = normalizedPath;
         }
       } else if (host.includes("naukri.com")) {
         if (parts[0] === "code360" && parts[1] === "problems" && parts[2]) {
           normalizedPath = `/code360/problems/${parts[2]}/`;
+          keyPath = normalizedPath;
         }
       }
 
-      normalizedPath = normalizedPath.replace(/\/{2,}/g, "/");
-      if (!normalizedPath.endsWith("/")) {
-        normalizedPath += "/";
-      }
+      normalizedPath = normalizePath(normalizedPath);
+      keyPath = normalizePath(keyPath);
 
-      return `${parsed.origin}${normalizedPath}`;
+      return {
+        normalizedUrl: `${parsed.origin}${normalizedPath}`,
+        matchKey: `${parsed.origin}${keyPath}`
+      };
     } catch {
       const base = String(rawUrl).split(/[?#]/)[0].replace(/\/+$/, "");
-      return base ? `${base}/` : "";
+      const fallback = base ? `${base}/` : "";
+      return { normalizedUrl: fallback, matchKey: fallback };
     }
   }
 
-  function isQuestionSaved(url, myQuestions, revisionList) {
-    const normalized = normalizeQuestionUrl(url);
-    if (!normalized) return false;
+  function normalizeQuestionUrl(rawUrl) {
+    return parseQuestionUrl(rawUrl).normalizedUrl;
+  }
 
-    return myQuestions.some((q) => normalizeQuestionUrl(q?.url) === normalized) ||
-      revisionList.some((q) => normalizeQuestionUrl(q?.url) === normalized);
+  function getQuestionMatchKey(rawUrl) {
+    return parseQuestionUrl(rawUrl).matchKey;
+  }
+
+  function isQuestionSaved(url, myQuestions, revisionList) {
+    const targetKey = getQuestionMatchKey(url);
+    if (!targetKey) return false;
+
+    return myQuestions.some((q) => getQuestionMatchKey(q?.url) === targetKey) ||
+      revisionList.some((q) => getQuestionMatchKey(q?.url) === targetKey);
   }
 
   async function syncFabStateForCurrentQuestion() {
@@ -203,11 +230,11 @@ if (!document.getElementById("problem-tracker-fab")) {
       return;
     }
 
-    const url = normalizeQuestionUrl(window.location.href);
+    const targetKey = getQuestionMatchKey(window.location.href);
     const { myQuestions, revisionList } = await getStoredCollections();
 
-    const nextQuestions = myQuestions.filter((q) => normalizeQuestionUrl(q?.url) !== url);
-    const nextRevision = revisionList.filter((q) => normalizeQuestionUrl(q?.url) !== url);
+    const nextQuestions = myQuestions.filter((q) => getQuestionMatchKey(q?.url) !== targetKey);
+    const nextRevision = revisionList.filter((q) => getQuestionMatchKey(q?.url) !== targetKey);
 
     chrome.storage.local.set({ myQuestions: nextQuestions, revisionList: nextRevision }, () => {
       setFabState("idle", "Save this problem to Problem Tracker");
