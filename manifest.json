@@ -10,6 +10,12 @@
         "tabs",
         "storage"
     ],
+    "externally_connectable": {
+        "ids": ["*"]
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
     "content_scripts": [
         {
             "matches": [
